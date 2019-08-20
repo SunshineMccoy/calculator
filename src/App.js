@@ -30,21 +30,33 @@ class Calculator extends React.Component {
         this.setState({
           display: this.state.oldNum + this.state.newNum,
           decimalPlaces: 0,
+          oldNum: this.state.oldNum + this.state.newNum,
+          newNum: 0,
+          done: true,
         })
       } else if (this.state.operator === '-') {
         this.setState({
           display: this.state.oldNum - this.state.newNum,
           decimalPlaces: 0,
+          oldNum: this.state.oldNum - this.state.newNum,
+          newNum: 0,
+          done: true,
         })
       } else if (this.state.operator === '*') {
         this.setState({
           display: this.state.oldNum * this.state.newNum,
           decimalPlaces: 0,
+          oldNum: this.state.oldNum * this.state.newNum,
+          newNum: 0,
+          done: true,
         })
       } else if (this.state.operator === '/') {
         this.setState({
           display: this.state.oldNum / this.state.newNum,
           decimalPlaces: 0,
+          oldNum: this.state.oldNum / this.state.newNum,
+          newNum: 0,
+          done: true,
         })
       }    
   }
@@ -53,7 +65,8 @@ class Calculator extends React.Component {
     if (this.state.operatorLast) {
       this.setState({
         operator: value,
-        display: (this.state.display.slice(0, (this.state.display.length -1)) + value)
+        display: (this.state.display.slice(0, (this.state.display.length -1)) + value),
+        done: false,
       })
     } else if (this.state.oldNum === null){
       this.setState({
@@ -63,7 +76,8 @@ class Calculator extends React.Component {
         newNum: 0,
         decimalPlaces: 0,
         decimal: false,
-        display: this.state.display + value
+        display: this.state.display + value,
+        done: false,
       })
     } else if (this.state.operator === '+') {
       this.setState({
@@ -73,7 +87,8 @@ class Calculator extends React.Component {
         newNum: 0,
         decimalPlaces: 0,
         decimal: false,
-        display: this.state.display + value
+        display: this.state.display + value,
+        done: false,
       })
     } else if (this.state.operator === '-') {
       this.setState({
@@ -83,7 +98,8 @@ class Calculator extends React.Component {
         newNum: 0,
         decimalPlaces: 0,
         decimal: false,
-        display: this.state.display + value
+        display: this.state.display + value,
+        done: false,
       })
       
     } else if (this.state.operator === '*') {
@@ -94,7 +110,8 @@ class Calculator extends React.Component {
         newNum: 0,
         decimalPlaces: 0,
         decimal: false,
-        display: this.state.display + value
+        display: this.state.display + value,
+        done: false,
       })
     } else if (this.state.operator === '/') {
       this.setState({
@@ -104,7 +121,8 @@ class Calculator extends React.Component {
         newNum: 0,
         decimalPlaces: 0,
         decimal: false,
-        display: this.state.display + value
+        display: this.state.display + value,
+        done: false,
       })
     }
   }
@@ -119,7 +137,8 @@ class Calculator extends React.Component {
         newNum: 0,
         display: '0',
         decimal: false,
-        decimalPlaces: 0
+        decimalPlaces: 0,
+        done: false,
       })
     } else if (value === '+') {
       this.operator(value)
@@ -148,7 +167,15 @@ class Calculator extends React.Component {
     
     //below this is if digits are entered
     else if (this.state.display.toString().length < 10) {
-      if (this.state.display[0] !== '0') {
+      if (this.state.done === true) {
+        this.setState({
+          operatorLast: false,
+          oldNum: null,
+          newNum: value,
+          display: value,
+          done: false,
+        })
+      } else if (this.state.display[0] !== '0') {
         if (this.state.decimal === false) {
           this.setState({
             operatorLast: false,
@@ -207,9 +234,33 @@ class Calculator extends React.Component {
 }
 
 class Key extends React.Component {
+  constructor(props) {
+    super(props);
+
+    // This binding is necessary to make `this` work in the callback
+    this.handleKeyPress = this.handleKeyPress.bind(this);
+  }
+
+  handleKeyPress = (event) => {
+    if (event.key == this.props.value || event.key.toUpperCase() == this.props.value) {
+      this.props.handleClick(this.props.value)
+    } else if (event.key === 'c' || event.key === 'C') {
+      this.props.handleClick('Clear')
+    } else if (event.key === 'Enter') {
+      this.props.handleClick('=')
+    }
+  }
+  componentDidMount(){
+    document.addEventListener("keydown", this.handleKeyPress, false);
+  }
+  componentWillUnmount(){
+    document.removeEventListener("keydown", this.handleKeyPress, false);
+  }
   render() {
     return (
-      <div id={this.props.name} className='button' onClick={() => {this.props.handleClick(this.props.value)}}>{this.props.value}</div>
+      <button id={this.props.name} className='button' onKeyDown={this.handleKeyPress} onClick={() => {this.props.handleClick(this.props.value)}}>
+        {this.props.value}
+      </button>
     )
   }
 }
