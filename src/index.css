@@ -28,6 +28,7 @@ body {
   grid-row-end: 2;
   font-size: 70px;
   text-align: right;
+  width: 400px;
 }
 #clear {
   grid-column-start: 1;
@@ -49,4 +50,10 @@ body {
   background-color: aliceblue;
   font-size: 50px;
   color: #FF66CC;
+}
+
+@media only screen and (max-device-width: 780px) {
+  #container {
+    margin-top: 0;
+  }
 }

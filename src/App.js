@@ -23,40 +23,45 @@ class Calculator extends React.Component {
     }
     this.handleClick = this.handleClick.bind(this)
     this.equalify = this.equalify.bind(this)
+    this.handleKeyPress = this.handleKeyPress.bind(this);
   }
   
   equalify = () => {
       if (this.state.operator === '+') {
         this.setState({
-          display: this.state.oldNum + this.state.newNum,
+          display: +parseFloat(this.state.oldNum + this.state.newNum).toFixed(4),
           decimalPlaces: 0,
-          oldNum: this.state.oldNum + this.state.newNum,
-          newNum: 0,
+          newNum: +parseFloat(this.state.oldNum + this.state.newNum).toFixed(4),
+          //newNum: 0,
           done: true,
+          operator: ""
         })
       } else if (this.state.operator === '-') {
         this.setState({
-          display: this.state.oldNum - this.state.newNum,
+          display: +parseFloat(this.state.oldNum - this.state.newNum).toFixed(4),
           decimalPlaces: 0,
-          oldNum: this.state.oldNum - this.state.newNum,
-          newNum: 0,
+          newNum: +parseFloat(this.state.oldNum - this.state.newNum).toFixed(4),
+          //newNum: 0,
           done: true,
+          operator: ""
         })
       } else if (this.state.operator === '*') {
         this.setState({
-          display: this.state.oldNum * this.state.newNum,
+          display: +parseFloat(this.state.oldNum * this.state.newNum).toFixed(4),
           decimalPlaces: 0,
-          oldNum: this.state.oldNum * this.state.newNum,
-          newNum: 0,
+          newNum: +parseFloat(this.state.oldNum * this.state.newNum).toFixed(4),
+          //newNum: 0,
           done: true,
+          operator: ""
         })
       } else if (this.state.operator === '/') {
         this.setState({
-          display: this.state.oldNum / this.state.newNum,
+          display: +parseFloat(this.state.oldNum / this.state.newNum).toFixed(4),
           decimalPlaces: 0,
-          oldNum: this.state.oldNum / this.state.newNum,
-          newNum: 0,
+          newNum: +parseFloat(this.state.oldNum / this.state.newNum).toFixed(4),
+          //newNum: 0,
           done: true,
+          operator: ""
         })
       }    
   }
@@ -68,7 +73,7 @@ class Calculator extends React.Component {
         display: (this.state.display.slice(0, (this.state.display.length -1)) + value),
         done: false,
       })
-    } else if (this.state.oldNum === null){
+    } else if (this.state.operator === ""){
       this.setState({
         operator: value,
         operatorLast: true,
@@ -83,7 +88,7 @@ class Calculator extends React.Component {
       this.setState({
         operator: value,
         operatorLast: true,
-        oldNum: this.state.oldNum + this.state.newNum,
+        oldNum: parseInt(this.state.oldNum) + parseInt(this.state.newNum),
         newNum: 0,
         decimalPlaces: 0,
         decimal: false,
@@ -129,6 +134,8 @@ class Calculator extends React.Component {
   
   
   handleClick = (value) => {
+    console.log(value)
+    console.log(this.state);
     if (value === 'Clear') {
       this.setState({
         operator: '',
@@ -207,10 +214,40 @@ class Calculator extends React.Component {
       }
     }
   }
+
+  handleKeyPress = (event) => {
+    
+ 
+    if (event.key === 'c' || event.key === 'C') {
+      this.handleClick('Clear')
+    } else if (event.key === 'Enter') {
+      this.handleClick('=')
+    } else if (event.key === '+') {
+      this.handleClick('+')
+    } else if (event.key === '-') {
+      this.handleClick('-')
+    } else if (event.key === '*') {
+      this.handleClick('*')
+    } else if (event.key === '/') {
+      this.handleClick('/')
+    } else if (event.key === '=') {
+      this.handleClick('=')
+    } else if (event.key === '.') {
+      this.handleClick('.')
+    } else if (!isNaN(parseInt(event.key))){
+      this.handleClick(parseInt(event.key))
+    }
+  }
+  componentDidMount(){
+    document.addEventListener("keypress", this.handleKeyPress, false);
+  }
+  componentWillUnmount(){
+    document.removeEventListener("keypress", this.handleKeyPress, false);
+  }
   render() {
     return (
       <div id='container'>
-        <div id='display' > {this.state.display} </div>
+        <div id='display' onKeyPress={this.handleKeyPress} > {this.state.display} </div>
         <Key value={'Clear'} name={'clear'} handleClick={this.handleClick} />
         <Key value={'/'} name={'divide'} handleClick={this.handleClick} />
         <Key value={7} name={'seven'} handleClick={this.handleClick} />
@@ -234,31 +271,9 @@ class Calculator extends React.Component {
 }
 
 class Key extends React.Component {
-  constructor(props) {
-    super(props);
-
-    // This binding is necessary to make `this` work in the callback
-    this.handleKeyPress = this.handleKeyPress.bind(this);
-  }
-
-  handleKeyPress = (event) => {
-    if (event.key == this.props.value || event.key.toUpperCase() == this.props.value) {
-      this.props.handleClick(this.props.value)
-    } else if (event.key === 'c' || event.key === 'C') {
-      this.props.handleClick('Clear')
-    } else if (event.key === 'Enter') {
-      this.props.handleClick('=')
-    }
-  }
-  componentDidMount(){
-    document.addEventListener("keydown", this.handleKeyPress, false);
-  }
-  componentWillUnmount(){
-    document.removeEventListener("keydown", this.handleKeyPress, false);
-  }
   render() {
     return (
-      <button id={this.props.name} className='button' onKeyDown={this.handleKeyPress} onClick={() => {this.props.handleClick(this.props.value)}}>
+      <button id={this.props.name} className='button' onClick={() => {this.props.handleClick(this.props.value)}}>
         {this.props.value}
       </button>
     )
